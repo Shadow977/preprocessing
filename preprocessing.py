@@ -11,6 +11,8 @@ from __future__ import division
 import pandas as pd
 import numpy as np
 import re
+from tqdm import tqdm
+import json
 import string
 import os
 from nltk.stem import WordNetLemmatizer
@@ -81,6 +83,12 @@ class Cleaner():
         cleaned_df= pd.DataFrame({'tweets':data})    #Create a personal CSV for all users
         cleaned_df.to_csv(self.folder+'/cleaned_data/'+username, index=False)
 
+    def clean(self):
+        print('Cleaning the data')
+        for username in tqdm(self.users):
+            self.clean_data(username)
+        print('Done cleaning the data')
+
 
 class Analytics():
 
@@ -89,6 +97,8 @@ class Analytics():
         # Make a folder to store per user insights
         if not os.path.exists(folder+'/users/'):
             os.mkdir(folder+'/users/')
+        if not os.path.exists(folder+'/analytics/'):
+            os.mkdir(folder+'/analytics/')
 
     def analyse_user(self, username):
         # Analyse for each user
@@ -114,6 +124,36 @@ class Analytics():
             plt.savefig(self.folder+'/users/'+username.strip('.csv')+'.png')
         else:
             plt.show()
+
+    def analyse(self, save=True):
+        print('Calculating the analysis of cleaned data')
+        l = os.listdir(self.folder+'/cleaned_data/')
+        max_words = []
+        averages = []
+        for username in tqdm(l):
+            analytics = {}
+            analytics['name'] = username.strip('.csv')
+            analytics['keywords'] = self.extract_keywords(username)
+            maximum, average = self.analyse_user(username)
+            analytics['max_number_of_words'] = max(maximum)
+            analytics['average'] = average
+            with open(self.folder+'/analytics/'+username.strip('.csv')+'.json') as f:
+                json.dump(analytics)
+            max_words.append(analytics['max_number_of_words'])
+            averages.append(average)
+
+        print('Done calculating the analytics')
+        ax = plt.subplot(11)
+        ax.bar(max_words, list(range(1,len(max_words)+1)), color='b', align='center', label='Maximum Words per User')
+        ax.bar(averages, list(range(1,len(averages)+1)), color='g', align='center', label='Average Words per User')
+        ax.autoscale(tight=True)
+        ax.xlabel('User Count')
+        ax.legend(loc='upper left')
+        if save:
+            plt.savefig('analytics.png')
+        else:
+            plt.show()
+
 
     def extract_keywords(self, username, max_features=5):
         '''Extracts keywords from the tweets and determines the most tweeted topic by the particular user'''
