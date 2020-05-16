@@ -76,5 +76,14 @@ top_keywords = analyser.extract_keywords('username.csv')
 top_n_keywords = analyser.extract_keywords('username.csv', max_features=n)  # Where n is an integer
 ```
 
+### 5) Overall cleaning and analysis:
+Run the following scripts:
+```python
+cleaner = Cleaner()
+cleaner.clean()     # To clean all data
+analyser = Analytics()
+analyser.analyse()  # For overall analysis
+```
+
 #### You may contribute more to this if required.  
 #### Please open an issue if any bug found
