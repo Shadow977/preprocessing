@@ -28,6 +28,7 @@ It will remove the following things:
 - URLs
 - Replaces numbers with \<NUMBER\>
 - Replaces words like 15k, 12cm, 100Km, etc with \<UNIT\>
+- Processes words like can't, won't, I'll, etc
 
 If you do not want to remove stop words, run the following:
 ```python

@@ -44,6 +44,14 @@ class Cleaner():
         # Preprocessing start
         for i in range(len(data)):
             temp = data[i]
+            temp = re.sub(r'&[a-zA-Z0-9]+;?', "", temp)               # Removes words like &nbsp; , &amp; , etc
+            temp = re.sub('RT', "", temp)               # Removes 'RT'
+            temp = re.sub("'ld", ' would', temp)      # Preprocess chat language
+            temp = re.sub("'d", " had", temp)
+            temp = re.sub("'ve", " have", temp)
+            temp = re.sub("'m", " am", temp)
+            temp = re.sub("n't", " not", temp)
+            temp = re.sub("won't", "would not", temp)
             temp = re.sub(r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)', "", temp)    # Replaces all urls
             if remove_mentions:
                 temp = re.sub("@[A-Za-z0-9_]+","",temp)     # Remove all mentions
@@ -54,6 +62,7 @@ class Cleaner():
             temp = re.sub('[0-9]+[a-zA-Z]+', '<UNIT>', temp)        # Replaces words like 15ft, 12cm, 5k with <UNIT>
             temp = re.sub('[0-9]+', '<NUMBER>', temp)               # Replaces all numbers with '<NUMBER>'
             temp = temp.lower()                                     # Converts the data to lowercase
+            temp = re.sub(' u ', ' you ', temp)
             data[i] = temp
             cleaned_list = []
             tokens = word_tokenize(data[i])                 # Tokenize data
