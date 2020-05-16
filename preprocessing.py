@@ -141,7 +141,7 @@ class Analytics():
                 maximum, average = self.analyse_user(username)
                 analytics['max_number_of_words'] = max(maximum)
                 analytics['average'] = average
-                with open(self.folder+'/analytics/'+username.strip('.csv')+'.json') as f:
+                with open(self.folder+'/analytics/'+username.strip('.csv')+'.json', 'w') as f:
                     json.dump(analytics)
                 max_words.append(analytics['max_number_of_words'])
                 averages.append(average)
