@@ -138,10 +138,13 @@ class Analytics():
                 analytics = {}
                 analytics['name'] = username.strip('.csv')
                 analytics['keywords'] = self.extract_keywords(username)
-                maximum, average = self.analyse_user(username)
+                try:
+                    maximum, average = self.analyse_user(username)
+                except ZeroDivisionError:
+                    maximum, average = [0], 0
                 analytics['max_number_of_words'] = max(maximum)
                 analytics['average'] = average
-                with open(self.folder+'/analytics/'+username.strip('.csv')+'.json', 'w') as f:
+                with open(self.folder+'/users/'+username.strip('.csv')+'.json', 'w') as f:
                     json.dump(analytics, f)
                 max_words.append(analytics['max_number_of_words'])
                 averages.append(average)
@@ -150,14 +153,13 @@ class Analytics():
 
         print('Done calculating the analytics')
         ax = plt.subplot(111)
-        ax.bar(max_words, list(range(1,len(max_words)+1)), color='b', align='center', label='Maximum Words per User')
-        ax.bar(averages, list(range(1,len(averages)+1)), color='g', align='center', label='Average Words per User')
+        ax.bar(list(range(1,len(max_words)+1)), max_words, color='b', align='center', label='Maximum Words per User: Maximum = {}'.format(max(max_words)))
+        ax.bar(list(range(1,len(averages)+1)), averages, color='g', align='center', label='Average Words per User: Maximum = {}'.format(int(averages)+1))
         ax.autoscale(tight=True)
-        ax.xlabel('User Count')
         ax.legend(loc='upper left')
         if save:
             print("Saving...")
-            plt.savefig('analytics.png')
+            plt.savefig(self.folder+'/analytics/analytics.png')
         else:
             plt.show()
         print("Done")
@@ -165,9 +167,12 @@ class Analytics():
 
     def extract_keywords(self, username, max_features=5):
         '''Extracts keywords from the tweets and determines the most tweeted topic by the particular user'''
-        corpus = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets']
-        corpus.dropna(inplace=True)
-        corpus = corpus.tolist()
-        vectorizer = TfidfVectorizer(max_features=max_features)
-        _ = vectorizer.fit_transform(corpus)
+        try:
+            corpus = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets']
+            corpus.dropna(inplace=True)
+            corpus = corpus.tolist()
+            vectorizer = TfidfVectorizer(max_features=max_features)
+            _ = vectorizer.fit_transform(corpus)
+        except ValueError:
+            return []
         return vectorizer.get_feature_names()
