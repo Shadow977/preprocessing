@@ -86,7 +86,10 @@ class Cleaner():
     def clean(self):
         print('Cleaning the data')
         for username in tqdm(self.users):
-            self.clean_data(username)
+            try:
+                self.clean_data(username)
+            except:
+                pass
         print('Done cleaning the data')
 
 
@@ -131,16 +134,19 @@ class Analytics():
         max_words = []
         averages = []
         for username in tqdm(l):
-            analytics = {}
-            analytics['name'] = username.strip('.csv')
-            analytics['keywords'] = self.extract_keywords(username)
-            maximum, average = self.analyse_user(username)
-            analytics['max_number_of_words'] = max(maximum)
-            analytics['average'] = average
-            with open(self.folder+'/analytics/'+username.strip('.csv')+'.json') as f:
-                json.dump(analytics)
-            max_words.append(analytics['max_number_of_words'])
-            averages.append(average)
+            try:
+                analytics = {}
+                analytics['name'] = username.strip('.csv')
+                analytics['keywords'] = self.extract_keywords(username)
+                maximum, average = self.analyse_user(username)
+                analytics['max_number_of_words'] = max(maximum)
+                analytics['average'] = average
+                with open(self.folder+'/analytics/'+username.strip('.csv')+'.json') as f:
+                    json.dump(analytics)
+                max_words.append(analytics['max_number_of_words'])
+                averages.append(average)
+            except:
+                pass
 
         print('Done calculating the analytics')
         ax = plt.subplot(11)
@@ -150,9 +156,11 @@ class Analytics():
         ax.xlabel('User Count')
         ax.legend(loc='upper left')
         if save:
+            print("Saving...")
             plt.savefig('analytics.png')
         else:
             plt.show()
+        print("Done")
 
 
     def extract_keywords(self, username, max_features=5):
