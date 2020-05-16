@@ -62,5 +62,19 @@ If you just want to view the plot and not save it, use
 analyser.plot_data('username.csv', save=False)
 ```
 
+### 4) Extract feature keywords:
+You can now extract feature keywords from the document for each user using this script:  
+dependency: ```scikit-learn```. If not installed, please run the following command again:
+```bash
+pip install -r requirements.txt
+```
+```python
+from preprocessing import Analytics
+analyser = Analytics()
+top_keywords = analyser.extract_keywords('username.csv')
+# By default, the top 5 keywords will be returned. If you want the top n keywords, run
+top_n_keywords = analyser.extract_keywords('username.csv', max_features=n)  # Where n is an integer
+```
+
 #### You may contribute more to this if required.  
 #### Please open an issue if any bug found

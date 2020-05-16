@@ -9,12 +9,15 @@ from __future__ import division
 
 
 import pandas as pd
+import numpy as np
 import re
 import string
 import os
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 import matplotlib.pyplot as plt
 
@@ -111,3 +114,12 @@ class Analytics():
             plt.savefig(self.folder+'/users/'+username.strip('.csv')+'.png')
         else:
             plt.show()
+
+    def extract_keywords(self, username, max_features=5):
+        '''Extracts keywords from the tweets and determines the most tweeted topic by the particular user'''
+        corpus = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets']
+        corpus.dropna(inplace=True)
+        corpus = corpus.tolist()
+        vectorizer = TfidfVectorizer(max_features=max_features)
+        _ = vectorizer.fit_transform(corpus)
+        return vectorizer.get_feature_names()
