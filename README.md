@@ -26,6 +26,8 @@ It will remove the following things:
 - Punctuations
 - Emojis and all other junks
 - URLs
+- Replaces numbers with <NUMBER>
+- Replaces words like 15k, 12cm, 100Km, etc with <UNIT>
 
 If you do not want to remove stop words, run the following:
 ```python
