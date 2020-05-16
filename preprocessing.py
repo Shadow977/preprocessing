@@ -141,15 +141,16 @@ class Analytics():
                 maximum, average = self.analyse_user(username)
                 analytics['max_number_of_words'] = max(maximum)
                 analytics['average'] = average
+                print(analytics)
                 with open(self.folder+'/analytics/'+username.strip('.csv')+'.json', 'w') as f:
-                    json.dump(analytics)
+                    json.dump(analytics, f)
                 max_words.append(analytics['max_number_of_words'])
                 averages.append(average)
-            except:
+            except IsADirectoryError:
                 pass
 
         print('Done calculating the analytics')
-        ax = plt.subplot(11)
+        ax = plt.subplot(111)
         ax.bar(max_words, list(range(1,len(max_words)+1)), color='b', align='center', label='Maximum Words per User')
         ax.bar(averages, list(range(1,len(averages)+1)), color='g', align='center', label='Average Words per User')
         ax.autoscale(tight=True)
