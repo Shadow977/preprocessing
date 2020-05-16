@@ -53,6 +53,7 @@ class Cleaner():
             temp = temp.encode('ascii', 'ignore').decode('ascii')       # Remove emojis and other junk
             temp = re.sub('[0-9]+[a-zA-Z]+', '<UNIT>', temp)        # Replaces words like 15ft, 12cm, 5k with <UNIT>
             temp = re.sub('[0-9]+', '<NUMBER>', temp)               # Replaces all numbers with '<NUMBER>'
+            temp = temp.lower()                                     # Converts the data to lowercase
             data[i] = temp
             cleaned_list = []
             tokens = word_tokenize(data[i])                 # Tokenize data
