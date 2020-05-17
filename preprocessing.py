@@ -40,7 +40,7 @@ class Cleaner():
 
     def clean_data(self, username, remove_hashtags=True, remove_mentions=True, remove_stopwords=True):
         # Read the CSV File. Helps if the CSV file is messed up
-        with open(self.folder+'/'+username, 'r') as f:
+        with open(self.folder+'/'+username, 'r', encoding='utf-8') as f:
             data = f.readlines()[1:]
         for i in range(len(data)):
             data[i] = data[i].strip('\n')
@@ -176,3 +176,73 @@ class Analytics():
         except ValueError:
             return []
         return vectorizer.get_feature_names()
+       
+class Numoftweets():
+    
+    def __init__(self, folder='tweets'):
+        self.folder=folder
+        # Make a folder to store per user insights
+        if not os.path.exists(folder+'/users/'):
+            os.mkdir(folder+'/users/')
+
+    
+    def user_data(self,username):
+        data = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets'].dropna().tolist()
+        no_tweets=len(data)
+        c=0
+        for tweet in data:
+            x=tweet.split()
+            c+=len(x)
+            
+        return c,no_tweets
+    
+    def plot_userdata(self,username='plot', save=True):
+        # Plot data
+        count=[]
+        numtweets=[]
+        for filename in os.listdir('tweets/cleaned_data/'):
+            c, no_tweets = self.user_data(filename)
+            count.append(c)
+            numtweets.append(no_tweets)
+        count.sort()
+        plt.bar(list(range(1,len(count)+1)), count)
+        plt.xlabel("user Number")
+        plt.ylabel("number of words")
+        plt.title("words per user")
+        if save:
+            plt.savefig('plot'+'.png')
+        else:
+            plt.show()
+    
+    def plot_userdataavg(self,username='plot1', save=True):
+        # Plot data
+        count=[]
+        numtweets=[]
+        for filename in os.listdir('tweets/cleaned_data/'):
+            c, no_tweets = self.user_data(filename)
+            count.append(c)
+            numtweets.append(no_tweets)
+            count_avg_temp=np.array(count) / np.array(numtweets)
+            count_avg=count_avg_temp.tolist()
+        #count_avg.sort()
+        plt.bar(list(range(1,len(count_avg)+1)), count_avg)
+        plt.xlabel("User Number")
+        plt.ylabel("number of words")
+        plt.title("user average words per tweet")
+        if save:
+            plt.savefig('plot1'+'.png')
+        else:
+            plt.show()
+    
+    def totalavg(self):
+        count=[]
+        numtweets=[]
+        for filename in os.listdir('tweets/cleaned_data/'):
+            c, no_tweets = self.user_data(filename)
+            count.append(c)
+            numtweets.append(no_tweets)
+        count=np.array(c)
+        count_total=np.sum(c)
+        tweet=np.array(no_tweets)
+        total_tweet=np.sum(tweet)
+        return (count_total/total_tweet)
