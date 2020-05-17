@@ -154,7 +154,7 @@ class Analytics():
         print('Done calculating the analytics')
         ax = plt.subplot(111)
         ax.bar(list(range(1,len(max_words)+1)), max_words, color='b', align='center', label='Maximum Words per User: Maximum = {}'.format(max(max_words)))
-        ax.bar(list(range(1,len(averages)+1)), averages, color='g', align='center', label='Average Words per User: Maximum = {}'.format(int(averages)+1))
+        ax.bar(list(range(1,len(averages)+1)), averages, color='g', align='center', label='Average Words per User: Maximum = {}'.format(int(max(averages))+1))
         ax.autoscale(tight=True)
         ax.legend(loc='upper left')
         if save:
