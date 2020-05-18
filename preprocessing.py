@@ -1,10 +1,3 @@
-##############################################
-# Author : Rutvik Trivedi                    #
-# Email: rutviktrivedi04@gmail.com           #
-# Website: https://Rutvik-Trivedi.github.io  #
-# Date: 15 May, 2020                         #
-##############################################
-
 from __future__ import division
 
 
@@ -40,7 +33,7 @@ class Cleaner():
 
     def clean_data(self, username, remove_hashtags=True, remove_mentions=True, remove_stopwords=True):
         # Read the CSV File. Helps if the CSV file is messed up
-        with open(self.folder+'/'+username, 'r') as f:
+        with open(self.folder+'/'+username, 'r', encoding='utf-8') as f:
             data = f.readlines()[1:]
         for i in range(len(data)):
             data[i] = data[i].strip('\n')
@@ -138,10 +131,13 @@ class Analytics():
                 analytics = {}
                 analytics['name'] = username.strip('.csv')
                 analytics['keywords'] = self.extract_keywords(username)
-                maximum, average = self.analyse_user(username)
+                try:
+                    maximum, average = self.analyse_user(username)
+                except ZeroDivisionError:
+                    maximum, average = [0], 0
                 analytics['max_number_of_words'] = max(maximum)
                 analytics['average'] = average
-                with open(self.folder+'/analytics/'+username.strip('.csv')+'.json', 'w') as f:
+                with open(self.folder+'/users/'+username.strip('.csv')+'.json', 'w') as f:
                     json.dump(analytics, f)
                 max_words.append(analytics['max_number_of_words'])
                 averages.append(average)
@@ -150,14 +146,13 @@ class Analytics():
 
         print('Done calculating the analytics')
         ax = plt.subplot(111)
-        ax.bar(max_words, list(range(1,len(max_words)+1)), color='b', align='center', label='Maximum Words per User')
-        ax.bar(averages, list(range(1,len(averages)+1)), color='g', align='center', label='Average Words per User')
+        ax.bar(list(range(1,len(max_words)+1)), max_words, color='b', align='center', label='Maximum Words per User: Maximum = {}'.format(max(max_words)))
+        ax.bar(list(range(1,len(averages)+1)), averages, color='g', align='center', label='Average Words per User: Maximum = {}'.format(int(max(averages))+1))
         ax.autoscale(tight=True)
-        ax.xlabel('User Count')
         ax.legend(loc='upper left')
         if save:
             print("Saving...")
-            plt.savefig('analytics.png')
+            plt.savefig(self.folder+'/analytics/analytics.png')
         else:
             plt.show()
         print("Done")
@@ -165,9 +160,82 @@ class Analytics():
 
     def extract_keywords(self, username, max_features=5):
         '''Extracts keywords from the tweets and determines the most tweeted topic by the particular user'''
-        corpus = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets']
-        corpus.dropna(inplace=True)
-        corpus = corpus.tolist()
-        vectorizer = TfidfVectorizer(max_features=max_features)
-        _ = vectorizer.fit_transform(corpus)
+        try:
+            corpus = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets']
+            corpus.dropna(inplace=True)
+            corpus = corpus.tolist()
+            vectorizer = TfidfVectorizer(max_features=max_features)
+            _ = vectorizer.fit_transform(corpus)
+        except ValueError:
+            return []
         return vectorizer.get_feature_names()
+       
+class Numoftweets():
+    
+    def __init__(self, folder='tweets'):
+        self.folder=folder
+        # Make a folder to store per user insights
+        if not os.path.exists(folder+'/users/'):
+            os.mkdir(folder+'/users/')
+
+    
+    def user_data(self,username):
+        data = pd.read_csv(self.folder+'/cleaned_data/'+username)['tweets'].dropna().tolist()
+        no_tweets=len(data)
+        c=0
+        for tweet in data:
+            x=tweet.split()
+            c+=len(x)
+            
+        return c,no_tweets
+    
+    def plot_userdata(self,username='plot', save=True):
+        # Plot data
+        count=[]
+        numtweets=[]
+        for filename in os.listdir('tweets/cleaned_data/'):
+            c, no_tweets = self.user_data(filename)
+            count.append(c)
+            numtweets.append(no_tweets)
+        count.sort()
+        plt.bar(list(range(1,len(count)+1)), count)
+        plt.xlabel("user Number")
+        plt.ylabel("number of words")
+        plt.title("words per user")
+        if save:
+            plt.savefig('plot'+'.png')
+        else:
+            plt.show()
+    
+    def plot_userdataavg(self,username='plot1', save=True):
+        # Plot data
+        count=[]
+        numtweets=[]
+        for filename in os.listdir('tweets/cleaned_data/'):
+            c, no_tweets = self.user_data(filename)
+            count.append(c)
+            numtweets.append(no_tweets)
+            count_avg_temp=np.array(count) / np.array(numtweets)
+            count_avg=count_avg_temp.tolist()
+        #count_avg.sort()
+        plt.bar(list(range(1,len(count_avg)+1)), count_avg)
+        plt.xlabel("User Number")
+        plt.ylabel("number of words")
+        plt.title("average words per user per tweet")
+        if save:
+            plt.savefig('plot1'+'.png')
+        else:
+            plt.show()
+    
+    def totalavg(self):
+        count=[]
+        numtweets=[]
+        for filename in os.listdir('tweets/cleaned_data/'):
+            c, no_tweets = self.user_data(filename)git
+            count.append(c)
+            numtweets.append(no_tweets)
+        count=np.array(c)
+        count_total=np.sum(c)
+        tweet=np.array(no_tweets)
+        total_tweet=np.sum(tweet)
+        return (count_total/total_tweet)
