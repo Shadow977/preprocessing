@@ -231,7 +231,7 @@ class Numoftweets():
         count=[]
         numtweets=[]
         for filename in os.listdir('tweets/cleaned_data/'):
-            c, no_tweets = self.user_data(filename)git
+            c, no_tweets = self.user_data(filename)
             count.append(c)
             numtweets.append(no_tweets)
         count=np.array(c)
