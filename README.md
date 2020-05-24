@@ -5,7 +5,7 @@ Report if any bugs are found
 
 ### 1) Installation:
 ```bash
-git clone https://github.com/Rutvik-Trivedi/preprocessing.git
+git clone https://github.com/Shadow977/preprocessing.git
 pip install -r requirements.txt
 ```
 After this, move the ```preprocessing.py``` file to the dataset folder ```Tweet-dataset```
